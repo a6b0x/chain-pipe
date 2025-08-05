@@ -1,0 +1,25 @@
+[workspace]
+resolver = "2"
+members = ["crates/*"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+
+[workspace.dependencies]
+# Ethereum interaction
+alloy = { version = "1.0", default-features = false, features = [
+    "json-rpc",
+    "rpc-client",
+] }
+# Serialization
+serde = { version = "1", features = ["derive"] } # Struct ⇄ JSON/TOML/CSV
+serde_json = "1"                                 # JSON de/serialization
+# Error handling
+eyre = "0.6" # Context-rich anyhow-style errors
+# Configuration
+config = "0.13" # TOML/ENV hierarchical config loader
+clap = { version = "4", default-features = false, features = [
+    "derive", # Derive Parser/Args via struct attributes
+    "std",    # Basic std support without color/help suggestions bloat
+] }
