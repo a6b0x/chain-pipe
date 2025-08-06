@@ -1,0 +1,10 @@
+[package]
+name = "source-uniswap"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+clap  = { workspace = true }
+config = { workspace = true }
+serde = { workspace = true }
+eyre = { workspace = true }

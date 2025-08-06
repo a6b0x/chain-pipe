@@ -1,0 +1,4 @@
+router_address = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
+ws_url = "wss://reth-ethereum.ithaca.xyz/ws"
+broker_url = "mq:9003"
+topic_name = "uniswap-v2-factoty-event"
