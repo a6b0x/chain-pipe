@@ -8,3 +8,5 @@ clap  = { workspace = true }
 config = { workspace = true }
 serde = { workspace = true }
 eyre = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
