@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  tsdb:
+    image: influxdb:3-core
+    restart: unless-stopped
+    volumes:
+      - ../../influxdb3:/var/lib/influxdb3
+    command: influxdb3 serve --node-id host01 --object-store file --data-dir /var/lib/influxdb3
+    ports:
+      - "8182:8181"
+    env_file:
+      - ./.env
+
+  tsdb-ui:
+    image: influxdata/influxdb3-ui:1.0.0
+    restart: unless-stopped
+    ports:
+      - "8899:80"
+      - "8800:8888"
+    command: --mode=admin
+    depends_on:
+      - tsdb
+
+  tsdb-dashboard:
+    image: grafana/grafana
+    restart: unless-stopped
+    volumes:
+      - ../../grafana:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - tsdb
