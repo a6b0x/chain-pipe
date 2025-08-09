@@ -1,4 +1,4 @@
 /target
 .DS_Store
-docker/dataflow
-
+docker/fluvio/metadata/*
+docker/fluvio/data/*
