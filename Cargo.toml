@@ -28,3 +28,13 @@ tracing-subscriber = { version = "0.3.19", default-features = false, features = 
     "fmt",        # Console formatter with colors and compact/json output
     "ansi",       # Optional colored output (can be disabled at runtime)
 ] }
+
+# Dataflow
+fluvio = { version = "0.50.1", default-features = false }
+
+# Async runtime
+tokio = { version = "1.47.1", default-features = false}
+
+# date and time handling
+chrono = { version = "0.4.41", default-features = false}
+
