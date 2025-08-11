@@ -1,0 +1,31 @@
+2025-08-11T04:37:02.367723Z  INFO source_uniswap: pair created: Log {
+    inner: Log {
+        address: 0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f,
+        data: LogData {
+            topics: [
+                0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9,
+                0x00000000000000000000000070aac4f77a03d54486d34996875924998a318385,
+                0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            ],
+            data: 0x000000000000000000000000fce93c5bc3523b6351259e22ab1d0d0c7466f789000000000000000000000000000000000000000000000000000000000006da59,
+        },
+    },
+    block_hash: Some(
+        0x1c519d660bb25e7bf4a4bd19355d43f43495abfa31125a933e5581a044e7e8fb,
+    ),
+    block_number: Some(
+        23115468,
+    ),
+    block_timestamp: Some(
+        1754887019,
+    ),
+    transaction_hash: Some(
+        0xb821b2e1fa2d5c2868c48110d9fc8b26377de58d08a387c3820e5d015ad93dbb,
+    ),
+    transaction_index: Some(
+        156,
+    ),
+    log_index: Some(
+        321,
+    ),
+    removed: false,
