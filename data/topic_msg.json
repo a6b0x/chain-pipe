@@ -1,0 +1,43 @@
+{
+    "decoded": {
+        "_3": "0x6db42",
+        "address": "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f",
+        "pair": "0x3e2ef80fa83d37d63986f653d16f48becd29e48d",
+        "token0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "token1": "0xe0d757b6c03655f7c7a1992f966f59892371a0dd"
+    },
+    "raw": {
+        "address": "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f",
+        "data": "0x0000000000000000000000003e2ef80fa83d37d63986f653d16f48becd29e48d000000000000000000000000000000000000000000000000000000000006db42",
+        "topics": [
+            "0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9",
+            "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+            "0x000000000000000000000000e0d757b6c03655f7c7a1992f966f59892371a0dd"
+        ]
+    }
+}
+{
+    "decoded": {
+        "_3": "0x6db48",
+        "address": "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f",
+        "pair": "0xf088309c2cf4176fa3ec5bbb502c188a80395728",
+        "token0": "0x081e6c244ecb5b16223bedd774cd693ff155c033",
+        "token1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+    },
+    "raw": {
+        "address": "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f",
+        "blockHash": "0x04142cd0d3f9704524c344f5ab7a5bdb11115d67f0096fa54c3bae52e97f9232",
+        "blockNumber": "0x160d092",
+        "blockTimestamp": "0x689aaacf",
+        "data": "0x000000000000000000000000f088309c2cf4176fa3ec5bbb502c188a80395728000000000000000000000000000000000000000000000000000000000006db48",
+        "logIndex": "0x172",
+        "removed": false,
+        "topics": [
+            "0x0d3648bd0f6ba80134a33ba9275ac585d9d315f0ad8355cddefde31afa28d0e9",
+            "0x000000000000000000000000081e6c244ecb5b16223bedd774cd693ff155c033",
+            "0x000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+        ],
+        "transactionHash": "0x3bb34d2be6a3bdcfab259c252b683bfafbab5aa93de4456d3eda0e0611db8e9a",
+        "transactionIndex": "0xba"
+    }
+}

@@ -41,11 +41,11 @@ async fn main() -> Result<()> {
     let mut stream = uniswap_v2.subscribe_pair_created().await?;
     while let Some(rpc_log) = stream.next().await {
         info!("pair created: {rpc_log:#?}");
-        let primitives_log = rpc_log.into();
+        let primitives_log = rpc_log.clone().into();
         match UniswapV2Factory::PairCreated::decode_log(&primitives_log) {
             Ok(event) => {
                 let payload = json!({
-                "raw": primitives_log,
+                "raw": rpc_log,
                 "decoded": event,
                 });
                 let msg = serde_json::to_string(&payload)?;
