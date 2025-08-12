@@ -5,11 +5,12 @@ use alloy::sol;
 use alloy::sol_types::SolEvent;
 use eyre::Result;
 use futures_util::StreamExt;
+use serde::Serialize;
 
 sol!(
     #[allow(missing_docs)]
     #[sol(rpc)]
-    #[derive(Debug)]
+    #[derive(Debug, Serialize)]
     UniswapV2Factory,
     "abi/UniswapV2Factory.json"
 );
@@ -23,7 +24,6 @@ impl UniswapV2 {
     pub async fn new(ws_url: &str, factory_address: Address) -> Result<Self> {
         let ws_connect = WsConnect::new(ws_url);
         let provider = ProviderBuilder::new().connect_ws(ws_connect).await?;
-
         let ws_provider = provider.erased();
 
         let factory = UniswapV2Factory::new(factory_address, ws_provider.clone());

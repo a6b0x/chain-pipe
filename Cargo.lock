@@ -4485,6 +4485,7 @@ dependencies = [
  "fluvio",
  "futures-util",
  "serde",
+ "serde_json",
  "tokio",
  "tracing",
  "tracing-subscriber",
