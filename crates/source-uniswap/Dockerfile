@@ -22,9 +22,9 @@ COPY crates/source-uniswap/src ./crates/source-uniswap/src
 RUN cargo build --release --bin source-uniswap
 
 # Stage 2: Create the final, minimal image
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
-# Install runtime dependencies (OpenSSL 3)
+# Install runtime dependencies
 RUN apt-get update \
  && apt-get install -y --no-install-recommends libssl3 ca-certificates \
  && rm -rf /var/lib/apt/lists/*
