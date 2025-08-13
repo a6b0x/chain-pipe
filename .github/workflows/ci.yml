@@ -1,0 +1,78 @@
+name: Docker Build and Push
+
+# Trigger workflow on push to master branch
+on:
+  push:
+    branches: [ "master" ]
+    paths:               # Trigger only when the following paths change
+     - 'crates/**/src/**'
+     - '**/Cargo.toml'
+     - '**/Cargo.lock'
+     - 'crates/**/Dockerfile'
+     - 'crates/**/abi/**'
+     - '.github/workflows/ci.yml'
+  workflow_dispatch: # Manual trigger method
+
+env:
+  REGISTRY: ghcr.io
+  # Image name prefix in GHCR format; ${{ github.repository }} resolves to 'owner/repo'.
+  IMAGE_PREFIX: ghcr.io/${{ github.repository }}
+
+jobs:
+  # New job to dynamically find all crates with a Dockerfile.
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      crates: ${{ steps.set-matrix.outputs.crates }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - id: set-matrix
+        name: Find crates with Dockerfiles
+        # This command finds directories inside 'crates/' that contain a Dockerfile and formats them as a JSON array.
+        run: |
+          CRATES=$(find crates -mindepth 1 -maxdepth 1 -type d -exec test -f {}/Dockerfile \; -print | xargs -I {} basename {} | jq -R . | jq -s .)
+          echo "crates=${CRATES}" >> $GITHUB_OUTPUT
+
+  build-and-push:
+    # This job now depends on the 'prepare' job to get the list of crates.
+    needs: prepare
+    strategy:
+      fail-fast: false
+      # The build matrix is now dynamically generated from the output of the 'prepare' job.
+      matrix:
+        crate: ${{ fromJson(needs.prepare.outputs.crates) }}
+    #  Execution environment
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out source code
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up Docker Buildx, an advanced container builder
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 3: Log in to GitHub Container Registry (GHCR)
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }} #  Use the repository owner's name
+          password: ${{ secrets.GITHUB_TOKEN }}    # Use the auto-generated GITHUB_TOKEN
+
+      # Step 4: Build and push the Docker image
+      - name: Build and push ${{ matrix.crate }}
+        uses: docker/build-push-action@v5
+        with:
+          context: .  # repo root
+          file: ./crates/${{ matrix.crate }}/Dockerfile
+          push: true
+          tags: |
+            # An immutable tag pointing to the exact Git commit SHA. Ideal for precise version control and rollbacks.
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.crate }}:${{ github.sha }}
+            # A floating tag for the "bleeding edge" version from the master branch. Safer and more descriptive than 'latest' for development builds.
+            ${{ env.IMAGE_PREFIX }}/${{ matrix.crate }}:edge
+          # Enable build cache. It uses GitHub Actions' cache backend to store Docker layers.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

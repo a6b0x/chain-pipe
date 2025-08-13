@@ -1,6 +1,6 @@
 use eyre::Result;
 use fluvio::metadata::topic::TopicSpec;
-use fluvio::{Fluvio, FluvioConfig, Offset, RecordKey};
+use fluvio::{Fluvio, FluvioConfig, RecordKey};
 
 const PARTITIONS: u32 = 1;
 const REPLICAS: u32 = 1;
@@ -45,10 +45,10 @@ impl MqClient {
         Ok(())
     }
 
-    pub async fn produce_record(&self, topic_name: &str, record: &str) -> Result<()> {
+    pub async fn produce_record(&self, record: &str) -> Result<()> {
         let producer = self
             .fluvio
-            .topic_producer(topic_name)
+            .topic_producer(&self.topic)
             .await
             .map_err(|e| eyre::eyre!("Failed to create producer: {}", e))?;
         producer

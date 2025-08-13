@@ -3,6 +3,10 @@ name = "source-uniswap"
 version.workspace = true
 edition.workspace = true
 
+[[bin]]
+name = "source-uniswap"
+path = "src/main.rs"
+
 [dependencies]
 clap  = { workspace = true }
 config = { workspace = true }

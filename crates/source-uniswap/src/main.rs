@@ -14,17 +14,22 @@ mod uni;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Load config (file + CLI)
     let app_cfg = init::AppConfig::from_file_or_cli()?;
     app_cfg.init_log()?;
     info!("starting source-uniswap with config: {app_cfg:#?}");
 
+    // Connect to Ethereum
     let factory_addr = Address::from_str(&app_cfg.uniswap_v2.factory_address)?;
     let eth_url = app_cfg.eth_node.ws_url;
     let uniswap_v2 = uni::UniswapV2::new(&eth_url, factory_addr).await?;
 
+    // Connect to Fluvio
     let mq_client = mq::MqClient::new(&app_cfg.fluvio.broker_url, &app_cfg.fluvio.topic_name)
         .await
         .expect("Failed to connect to Fluvio. Please check the broker_url.");
+
+    // Ensure topic exists
     let topics = mq_client.list_topics().await?;
     let is_exist = topics.iter().any(|t| t == &app_cfg.fluvio.topic_name);
     if !is_exist {
@@ -38,23 +43,20 @@ async fn main() -> Result<()> {
     }
     info!("topics: {topics:#?}");
 
+    // Subscribe and forward events
     let mut stream = uniswap_v2.subscribe_pair_created().await?;
+    info!("Listening for PairCreated events…");
     while let Some(rpc_log) = stream.next().await {
-        info!("pair created: {rpc_log:#?}");
         let primitives_log = rpc_log.clone().into();
-        match UniswapV2Factory::PairCreated::decode_log(&primitives_log) {
+        let decode_log = UniswapV2Factory::PairCreated::decode_log(&primitives_log);
+        match decode_log {
             Ok(event) => {
-                let payload = json!({
-                "raw": rpc_log,
-                "decoded": event,
-                });
+                let payload = json!({"raw": rpc_log,"decoded": event});
                 let msg = serde_json::to_string(&payload)?;
-                info!("pair created: {msg}");
-                mq_client
-                    .produce_record(&app_cfg.fluvio.topic_name, &msg)
-                    .await?;
+                info!("Sending event: {msg}");
+                mq_client.produce_record(&msg).await?;
             }
-            Err(e) => warn!("decode failed: {e}"),
+            Err(e) => warn!("Decode failed: {e}"),
         }
     }
 

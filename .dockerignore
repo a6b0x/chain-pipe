@@ -1,0 +1,9 @@
+# Ignore the Git directory. 
+.git
+.gitignore
+
+# Ignore the Rust build artifacts directory. It should be generated inside the container.
+target/
+
+# Ignore documentation and environment files.
+**/*.md

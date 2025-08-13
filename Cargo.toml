@@ -39,7 +39,12 @@ tokio = { version = "1.47.1", default-features = false }
 # chrono = { version = "0.4.41", default-features = false }
 
 # Ethereum
-alloy = { version = "1.0.24", features = ["full"] }
+alloy = { version = "1.0.24", default-features = false, features = [
+    "std",
+    "provider-ws",
+    "rpc-types",
+    "contract",
+] }
 
 # Stream
 futures-util = { version = "0.3.31", default-features = false, features = ["async-await"] }
