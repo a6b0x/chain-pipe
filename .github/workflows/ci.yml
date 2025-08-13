@@ -76,9 +76,7 @@ jobs:
           file: ./crates/${{ matrix.crate }}/Dockerfile
           push: true
           tags: |
-            # An immutable tag pointing to the exact Git commit SHA. Ideal for precise version control and rollbacks.
             ${{ env.IMAGE_PREFIX }}/${{ matrix.crate }}:${{ github.sha }}
-            # A floating tag for the "bleeding edge" version from the master branch. Safer and more descriptive than 'latest' for development builds.
             ${{ env.IMAGE_PREFIX }}/${{ matrix.crate }}:edge
           # Enable build cache. It uses GitHub Actions' cache backend to store Docker layers.
           cache-from: type=gha
