@@ -34,6 +34,3 @@ WORKDIR /app
 
 # Copy the binary to a standard location
 COPY --from=builder /app/target/release/source-uniswap /usr/local/bin/source-uniswap
-
-# Set the command to run when container starts
-ENTRYPOINT ["source-uniswap"]
