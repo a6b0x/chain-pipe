@@ -8,7 +8,6 @@ WORKDIR /app
 COPY Cargo.toml Cargo.lock ./
 # Copy crate manifest to ensure dependency resolution succeeds
 COPY crates/source-uniswap/Cargo.toml ./crates/source-uniswap/
-COPY config ./config
 
 # 2. Create a minimal skeleton so `cargo build` can cache deps
 RUN mkdir -p crates/source-uniswap/src \
@@ -17,6 +16,9 @@ RUN mkdir -p crates/source-uniswap/src \
 
 # 3. Copy only this crate’s real source
 COPY crates/source-uniswap/src ./crates/source-uniswap/src
+# Copy ABI definitions required at compile time by the `sol!` macro.
+COPY crates/source-uniswap/abi ./crates/source-uniswap/abi
+COPY config ./config
 
 # 4. Re-build the actual binary
 RUN cargo build --release --bin source-uniswap
@@ -33,4 +35,6 @@ RUN apt-get update \
 WORKDIR /app
 
 # Copy the binary to a standard location
-COPY --from=builder /app/target/release/source-uniswap /usr/local/bin/source-uniswap
+COPY --from=builder /app/config /app/config
+COPY --from=builder /app/target/release/source-uniswap /app/source-uniswap
+RUN chmod +x /app/source-uniswap
