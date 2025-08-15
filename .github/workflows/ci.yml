@@ -19,36 +19,12 @@ env:
   IMAGE_PREFIX: ghcr.io/${{ github.repository }}
 
 jobs:
-  # New job to dynamically find all crates with a Dockerfile.
-  prepare:
-    runs-on: ubuntu-latest
-    outputs:
-      crates: ${{ steps.set-matrix.outputs.crates }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - id: set-matrix
-        name: Find crates with Dockerfiles
-        # This command finds directories inside 'crates/' that contain a Dockerfile and formats them as a JSON array.
-        run: |
-          # Step 1: list all first-level directories inside 'crates/'
-          DIRS=$(find crates -mindepth 1 -maxdepth 1 -type d)
-
-          # Step 2: keep only those directories that contain a Dockerfile
-          CRATE_NAMES=$(echo "$DIRS" | xargs -I {} basename {} | xargs -I {} sh -c 'test -f "crates/{}/Dockerfile" && echo {}')
-
-          # Step 3: convert the newline-separated names into a compact JSON array
-          JSON=$(echo "$CRATE_NAMES" | jq -R . | jq -sc '.')
-          echo "crates=${JSON}" >> $GITHUB_OUTPUT
-
   build-and-push:
-    # This job now depends on the 'prepare' job to get the list of crates.
-    needs: prepare
     strategy:
       fail-fast: false
-      # The build matrix is now dynamically generated from the output of the 'prepare' job.
+      # The build matrix now explicitly lists all services to be built.
       matrix:
-        crate: ${{ fromJson(needs.prepare.outputs.crates) }}
+        crate: [ "source-uniswap" ]
     #  Execution environment
     runs-on: ubuntu-latest
     steps:
@@ -72,8 +48,12 @@ jobs:
       - name: Build and push ${{ matrix.crate }}
         uses: docker/build-push-action@v5
         with:
-          context: .  # repo root
-          file: ./crates/${{ matrix.crate }}/Dockerfile
+          context: .
+          # Use the generic Dockerfile template for all services.
+          file: ./Dockerfile
+          # Pass the crate name as a build argument to the Dockerfile.
+          build-args: |
+            CRATE_NAME=${{ matrix.crate }}
           push: true
           tags: |
             ${{ env.IMAGE_PREFIX }}/${{ matrix.crate }}:${{ github.sha }}
