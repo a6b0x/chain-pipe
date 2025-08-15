@@ -1,40 +1,33 @@
-# Stage 1: Build the application
+# Stage 1: Compile the application in a full Rust environment
 FROM rust:1.87 as builder
-
-# Set the working directory
+ 
+# Set up the application directory.
 WORKDIR /app
-
-# 1. Copy workspace-level lock & manifest for dependency caching
-COPY Cargo.toml Cargo.lock ./
-# Copy crate manifest to ensure dependency resolution succeeds
-COPY crates/source-uniswap/Cargo.toml ./crates/source-uniswap/
-
-# 2. Create a minimal skeleton so `cargo build` can cache deps
-RUN mkdir -p crates/source-uniswap/src \
- && echo "fn main() {}" > crates/source-uniswap/src/main.rs \
- && cargo build --release --bin source-uniswap
-
-# 3. Copy only this crate’s real source
-COPY crates/source-uniswap/src ./crates/source-uniswap/src
-# Copy ABI definitions required at compile time by the `sol!` macro.
-COPY crates/source-uniswap/abi ./crates/source-uniswap/abi
-COPY config ./config
-
-# 4. Re-build the actual binary
+ 
+# Copy the entire project context.
+# The .dockerignore file will prevent unnecessary files from being copied.
+COPY . .
+ 
+# Compile the application.
+# This will create the binary at /app/target/release/source-uniswap
 RUN cargo build --release --bin source-uniswap
-
-# Stage 2: Create the final, minimal image
+ 
+ 
+# Stage 2: Create the final, minimal production image
 FROM debian:bookworm-slim
-
-# Install runtime dependencies
-RUN apt-get update \
- && apt-get install -y --no-install-recommends libssl3 ca-certificates \
- && rm -rf /var/lib/apt/lists/*
-
-# Set the working directory in the final image
+ 
+# Install only essential runtime dependencies.
+# 'strace' is included for debugging; it can be removed for a smaller production image.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libssl3 ca-certificates strace && \
+    rm -rf /var/lib/apt/lists/*
+ 
 WORKDIR /app
-
-# Copy the binary to a standard location
-COPY --from=builder /app/config /app/config
+ 
+# Copy the compiled binary and the configuration from the builder stage.
 COPY --from=builder /app/target/release/source-uniswap /app/source-uniswap
+COPY --from=builder /app/config /app/config
+ 
+# Ensure the binary is executable and define the entrypoint.
 RUN chmod +x /app/source-uniswap
+ENTRYPOINT ["/app/source-uniswap"]
