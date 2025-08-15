@@ -31,7 +31,10 @@ WORKDIR /app
 # Copy the compiled binary and the configuration from the builder stage.
 COPY --from=builder /app/target/release/${CRATE_NAME} /app/${CRATE_NAME}
 COPY --from=builder /app/config /app/config
- 
+
 # Ensure the binary is executable and define the entrypoint.
 RUN chmod +x /app/${CRATE_NAME}
-ENTRYPOINT ["/app/${CRATE_NAME}"]
+
+# This robust entrypoint allows variable expansion, correctly passes all arguments,
+# and ensures proper signal handling with `exec`.
+ENTRYPOINT ["sh", "-c", "exec /app/${CRATE_NAME} \"$@\"", "${CRATE_NAME}"]
