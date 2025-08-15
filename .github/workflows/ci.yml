@@ -5,11 +5,9 @@ on:
   push:
     branches: [ "master" ]
     paths:               # Trigger only when the following paths change
-     - 'crates/**/src/**'
-     - '**/Cargo.toml'
-     - '**/Cargo.lock'
-     - 'crates/**/Dockerfile'
-     - 'crates/**/abi/**'
+     - 'Cargo.toml'
+     - 'Cargo.lock'
+     - 'Dockerfile'
      - '.github/workflows/ci.yml'
   workflow_dispatch: # Manual trigger method
 

@@ -6,7 +6,8 @@ ARG CRATE_NAME
 
 # Stage 1: Build the application in a full Rust environment
 FROM rust:1.87 as builder
- 
+ARG CRATE_NAME # Make CRATE_NAME available in this stage
+
 # Set up the application directory.
 WORKDIR /app
  
@@ -19,6 +20,7 @@ RUN cargo build --release --bin ${CRATE_NAME}
  
 # Stage 2: Create the final, minimal production image
 FROM debian:bookworm-slim
+ARG CRATE_NAME # Make CRATE_NAME available in this stage
  
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libssl3 ca-certificates && \
