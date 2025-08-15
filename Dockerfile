@@ -21,7 +21,7 @@ RUN cargo build --release --bin ${CRATE_NAME}
 # Stage 2: Create the final, minimal production image
 FROM debian:bookworm-slim
 ARG CRATE_NAME # Make CRATE_NAME available in this stage
- 
+ # 将 CRATE_NAME 设置为运行时环境变量，以便 ENTRYPOINT 可以使用它。
 RUN apt-get update && \
     apt-get install -y --no-install-recommends libssl3 ca-certificates && \
     rm -rf /var/lib/apt/lists/*
@@ -29,12 +29,8 @@ RUN apt-get update && \
 WORKDIR /app
  
 # Copy the compiled binary and the configuration from the builder stage.
-COPY --from=builder /app/target/release/${CRATE_NAME} /app/${CRATE_NAME}
 COPY --from=builder /app/config /app/config
+COPY --from=builder /app/target/release/${CRATE_NAME} /app/${CRATE_NAME}
 
 # Ensure the binary is executable and define the entrypoint.
 RUN chmod +x /app/${CRATE_NAME}
-
-# This robust entrypoint allows variable expansion, correctly passes all arguments,
-# and ensures proper signal handling with `exec`.
-ENTRYPOINT ["sh", "-c", "exec /app/${CRATE_NAME} \"$@\"", "${CRATE_NAME}"]
