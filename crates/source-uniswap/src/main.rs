@@ -24,24 +24,10 @@ async fn main() -> Result<()> {
     let eth_url = app_cfg.eth_node.ws_url;
     let uniswap_v2 = uni::UniswapV2::new(&eth_url, factory_addr).await?;
 
-    // Connect to Fluvio
-    let mq_client = mq::MqClient::new(&app_cfg.fluvio.broker_url, &app_cfg.fluvio.topic_name)
+    // Connect to NATS
+    let mq_client = mq::MqClient::new(&app_cfg.nats.server_url, &app_cfg.nats.subject_name)
         .await
-        .expect("Failed to connect to Fluvio. Please check the broker_url.");
-
-    // Ensure topic exists
-    let topics = mq_client.list_topics().await?;
-    let is_exist = topics.iter().any(|t| t == &app_cfg.fluvio.topic_name);
-    if !is_exist {
-        info!(
-            "topic '{}' not found, creating...",
-            app_cfg.fluvio.topic_name
-        );
-        mq_client.create_topic(&app_cfg.fluvio.topic_name).await?;
-    } else {
-        info!("topic {} already exist", app_cfg.fluvio.topic_name);
-    }
-    info!("topics: {topics:#?}");
+        .expect("Failed to connect to NATS server. Please check the server_url.");
 
     // Subscribe and forward events
     let mut stream = uniswap_v2.subscribe_pair_created().await?;
@@ -54,11 +40,10 @@ async fn main() -> Result<()> {
                 let payload = json!({"raw": rpc_log,"decoded": event});
                 let msg = serde_json::to_string(&payload)?;
                 info!("Sending event: {msg}");
-                mq_client.produce_record(&msg).await?;
+                mq_client.produce_record(msg).await?;
             }
             Err(e) => warn!("Decode failed: {e}"),
         }
     }
-
     Ok(())
 }

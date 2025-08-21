@@ -1,0 +1,15 @@
+services:
+  nats-server:
+    image: nats:latest
+    container_name: nats-server
+    command: --jetstream
+    restart: unless-stopped
+    volumes:
+      - ../chain-pipe/docker/nats/data:/tmp/nats
+
+  nats-client:
+    image: natsio/nats-box:latest
+    container_name: nats-client
+    depends_on:
+      - nats-server
+    command: tail -f /dev/null

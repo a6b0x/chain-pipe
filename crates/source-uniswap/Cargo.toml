@@ -15,8 +15,9 @@ serde_json = { workspace = true }
 eyre = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-fluvio = { workspace = true }
+# fluvio = { workspace = true }
 tokio = { workspace = true }
 # chrono = { workspace = true }
 alloy = { workspace = true }
 futures-util = { workspace = true }
+async-nats = { workspace = true }

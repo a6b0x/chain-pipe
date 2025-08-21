@@ -10,7 +10,7 @@ use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 pub struct AppConfig {
     pub eth_node: EthNodeConfig,
     pub uniswap_v2: UniswapV2Config,
-    pub fluvio: FluvioConfig,
+    pub nats: NatsConfig,
     pub log: Option<LogConfig>,
 }
 #[derive(Debug, Deserialize)]
@@ -23,9 +23,9 @@ pub struct UniswapV2Config {
 }
 
 #[derive(Debug, Deserialize)]
-pub struct FluvioConfig {
-    pub broker_url: String,
-    pub topic_name: String,
+pub struct NatsConfig {
+    pub server_url: String,
+    pub subject_name: String,
 }
 #[derive(Debug, Deserialize)]
 pub struct LogConfig {
@@ -42,10 +42,10 @@ struct Cli {
     factory_address: Option<String>,
 
     #[arg(long)]
-    broker_url: Option<String>,
+    server_url: Option<String>,
 
     #[arg(long)]
-    topic_name: Option<String>,
+    subject_name: Option<String>,
 }
 
 impl AppConfig {
@@ -59,8 +59,8 @@ impl AppConfig {
             .add_source(File::from(config_path2).required(false))
             .set_override_option("eth_node.ws_url", cli.ws_url)?
             .set_override_option("uniswap_v2.factory_address", cli.factory_address)?
-            .set_override_option("fluvio.broker_url", cli.broker_url)?
-            .set_override_option("fluvio.topic_name", cli.topic_name)?
+            .set_override_option("nats.server_url", cli.server_url)?
+            .set_override_option("nats.subject_name", cli.subject_name)?
             .build()
             .map_err(eyre::Report::from)?
             .try_deserialize()?;

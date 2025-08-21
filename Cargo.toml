@@ -30,10 +30,12 @@ tracing-subscriber = { version = "0.3.19", default-features = false, features = 
 ] }
 
 # Dataflow
-fluvio = { version = "0.50.1", default-features = false }
+# fluvio = { version = "0.50.1", default-features = false }
 
 # Async runtime
-tokio = { version = "1.47.1", default-features = false }
+tokio = { version = "1.47.1", default-features = false, features = [
+    "rt-multi-thread",
+] }
 
 # date and time handling
 # chrono = { version = "0.4.41", default-features = false }
@@ -47,4 +49,11 @@ alloy = { version = "1.0.24", default-features = false, features = [
 ] }
 
 # Stream
-futures-util = { version = "0.3.31", default-features = false, features = ["async-await"] }
+futures-util = { version = "0.3.31", default-features = false, features = [
+    "async-await",
+] }
+
+# Message Queue
+async-nats = { version = "0.42.0", default-features = false, features = [
+    "ring",
+] }

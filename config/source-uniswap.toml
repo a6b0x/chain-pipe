@@ -2,6 +2,6 @@
 ws_url = "wss://reth-ethereum.ithaca.xyz/ws"
 [uniswap_v2]
 factory_address = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
-[fluvio]
-broker_url = "sc:9003"
-topic_name = "univ2-factoty"
+[nats]
+server_url = "nats-server:4222"
+subject_name = "eth.univ2.pair_created.0"
