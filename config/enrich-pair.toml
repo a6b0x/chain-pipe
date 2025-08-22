@@ -1,0 +1,8 @@
+[eth_node]
+http_url = "https://reth-ethereum.ithaca.xyz/rpc"
+
+[nats]
+server_url = "nats-server:4222"
+subject_input = "eth.univ2.pair_created.0"
+kv_bucket = "univ2_new_pairs"
+subject_output = "eth.univ2.pair_created.1"
