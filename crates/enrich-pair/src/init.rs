@@ -24,6 +24,7 @@ pub struct NatsConfig {
     pub subject_input: String,
     pub kv_bucket: String,
     pub subject_output: String,
+    pub stream_name: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -40,6 +41,12 @@ struct Cli {
     server_url: Option<String>,
     #[arg(long)]
     subject_input: Option<String>,
+    #[arg(long)]
+    subject_output: Option<String>,
+    #[arg(long)]
+    kv_bucket: Option<String>,
+    #[arg(long)]
+    stream_name: Option<String>,
 }
 
 impl AppConfig {
@@ -54,6 +61,9 @@ impl AppConfig {
             .set_override_option("eth_node.http_url", cli.http_url)?
             .set_override_option("nats.server_url", cli.server_url)?
             .set_override_option("nats.subject_input", cli.subject_input)?
+            .set_override_option("nats.subject_output", cli.subject_output)?
+            .set_override_option("nats.kv_bucket", cli.kv_bucket)?
+            .set_override_option("nats.stream_name", cli.stream_name)?
             .build()
             .map_err(eyre::Report::from)?
             .try_deserialize()?;

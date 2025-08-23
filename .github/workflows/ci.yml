@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
       # The build matrix now explicitly lists all services to be built.
       matrix:
-        crate: [ "source-uniswap" ]
+        crate: [ "source-uniswap" , "enrich-pair" ]
     #  Execution environment
     runs-on: ubuntu-latest
     steps:

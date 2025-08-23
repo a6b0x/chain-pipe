@@ -17,14 +17,14 @@ pub struct ERC20 {
     pub http_provider: DynProvider,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Pair {
     pub address: Address,
     pub token0: Token,
     pub token1: Token,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Token {
     pub address: Address,
     pub decimals: u8,

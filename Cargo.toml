@@ -47,8 +47,6 @@ alloy = { version = "1.0.25", default-features = false, features = [
     "provider-ws",
     "rpc-types",
     "contract",
-    "provider-http",
-    "reqwest",
 ] }
 
 # Stream
