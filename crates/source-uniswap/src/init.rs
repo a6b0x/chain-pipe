@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use config::{Config, File};
 use eyre::Result;
 use serde::Deserialize;
@@ -32,39 +32,77 @@ pub struct LogConfig {
     pub level: String,
 }
 
-#[derive(Parser, Debug)]
+#[derive(Parser, Debug, Clone)]
 #[command(author, version, about, long_about = None)]
-struct Cli {
-    #[arg(long)]
-    ws_url: Option<String>,
+pub struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
 
-    #[arg(long)]
-    factory_address: Option<String>,
+#[derive(Subcommand, Debug, Clone)]
+pub enum Commands {
+    PairCreatedEvent {
+        #[arg(long)]
+        ws_url: Option<String>,
+        #[arg(long)]
+        factory_address: Option<String>,
+        #[arg(long)]
+        server_url: Option<String>,
+        #[arg(long)]
+        subject_name: Option<String>,
+    },
 
-    #[arg(long)]
-    server_url: Option<String>,
-
-    #[arg(long)]
-    subject_name: Option<String>,
+    SyncEvent {
+        #[arg(long)]
+        ws_url: Option<String>,
+        #[arg(long)]
+        server_url: Option<String>,
+        #[arg(long)]
+        subject_name: Option<String>,
+    },
 }
 
 impl AppConfig {
-    pub fn from_file_or_cli() -> Result<AppConfig> {
+    pub fn from_file_or_cli() -> Result<(AppConfig, Commands)> {
         let cli = Cli::parse();
+        let cmd = cli.command.clone();
         let config_path1 = Path::new("config/source-uniswap.toml");
         let config_path2 = Path::new("source-uniswap.toml");
 
-        let cfg: AppConfig = Config::builder()
+        let mut builder = Config::builder()
             .add_source(File::from(config_path1).required(false))
-            .add_source(File::from(config_path2).required(false))
-            .set_override_option("eth_node.ws_url", cli.ws_url)?
-            .set_override_option("uniswap_v2.factory_address", cli.factory_address)?
-            .set_override_option("nats.server_url", cli.server_url)?
-            .set_override_option("nats.subject_name", cli.subject_name)?
+            .add_source(File::from(config_path2).required(false));
+
+        match cli.command {
+            Commands::PairCreatedEvent {
+                ws_url,
+                factory_address,
+                server_url,
+                subject_name,
+            } => {
+                builder = builder
+                    .set_override_option("eth_node.ws_url", ws_url)?
+                    .set_override_option("uniswap_v2.factory_address", factory_address)?
+                    .set_override_option("nats.server_url", server_url)?
+                    .set_override_option("nats.subject_name", subject_name)?;
+            }
+            Commands::SyncEvent {
+                ws_url,
+                server_url,
+                subject_name,
+            } => {
+                builder = builder
+                    .set_override_option("eth_node.ws_url", ws_url)?
+                    .set_override_option("nats.server_url", server_url)?
+                    .set_override_option("nats.subject_name", subject_name)?;
+            }
+        }
+
+        let cfg: AppConfig = builder
             .build()
             .map_err(eyre::Report::from)?
             .try_deserialize()?;
-        Ok(cfg)
+        Ok((cfg, cmd))
     }
 
     pub fn init_log(&self) -> Result<()> {

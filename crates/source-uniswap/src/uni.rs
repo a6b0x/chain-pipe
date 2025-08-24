@@ -15,6 +15,15 @@ sol!(
     "abi/UniswapV2Factory.json"
 );
 
+sol!(
+    #[allow(clippy::too_many_arguments)]
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    #[derive(Debug, Serialize)]
+    UniswapV2Pair,
+    "abi/UniswapV2Pair.json"
+);
+
 pub struct UniswapV2 {
     pub ws_provider: DynProvider,
     pub factory: UniswapV2Factory::UniswapV2FactoryInstance<DynProvider>,
@@ -33,11 +42,19 @@ impl UniswapV2 {
         })
     }
 
-    pub async fn subscribe_pair_created(&self) -> Result<impl StreamExt<Item = Log>> {
+    pub async fn subscribe_pair_created_event(&self) -> Result<impl StreamExt<Item = Log>> {
         let event_signature = UniswapV2Factory::PairCreated::SIGNATURE_HASH;
         let filter = Filter::new()
             .event_signature(event_signature)
             .address(*self.factory.address());
+
+        let sub = self.ws_provider.subscribe_logs(&filter).await?;
+        Ok(sub.into_stream())
+    }
+
+    pub async fn subscribe_sync_event(&self) -> Result<impl StreamExt<Item = Log>> {
+        let event_signature = UniswapV2Pair::Sync::SIGNATURE_HASH;
+        let filter = Filter::new().event_signature(event_signature);
 
         let sub = self.ws_provider.subscribe_logs(&filter).await?;
         Ok(sub.into_stream())

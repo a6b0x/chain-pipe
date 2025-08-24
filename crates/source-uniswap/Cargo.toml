@@ -18,6 +18,11 @@ tracing-subscriber = { workspace = true }
 # fluvio = { workspace = true }
 tokio = { workspace = true }
 # chrono = { workspace = true }
-alloy = { workspace = true }
+alloy = { workspace = true, features = [
+    "std",
+    "provider-ws",
+    "rpc-types",
+    "contract",
+] }
 futures-util = { workspace = true }
 async-nats = { workspace = true }

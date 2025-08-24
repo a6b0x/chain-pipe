@@ -6,8 +6,9 @@ use serde_json::json;
 use std::str::FromStr;
 use tracing::{info, warn};
 
-use uni::UniswapV2Factory;
-
+use init::AppConfig;
+use init::Commands;
+use uni::{UniswapV2Factory, UniswapV2Pair};
 mod init;
 mod mq;
 mod uni;
@@ -15,10 +16,19 @@ mod uni;
 #[tokio::main]
 async fn main() -> Result<()> {
     // Load config (file + CLI)
-    let app_cfg = init::AppConfig::from_file_or_cli()?;
+    let (app_cfg, app_cmd) = init::AppConfig::from_file_or_cli()?;
     app_cfg.init_log()?;
     info!("starting source-uniswap with config: {app_cfg:#?}");
 
+    match app_cmd {
+        Commands::PairCreatedEvent { .. } => run_pair_created(app_cfg).await?,
+        Commands::SyncEvent { .. } => run_sync_event(app_cfg).await?,
+    }
+
+    Ok(())
+}
+
+async fn run_pair_created(app_cfg: AppConfig) -> Result<()> {
     // Connect to Ethereum
     let factory_addr = Address::from_str(&app_cfg.uniswap_v2.factory_address)?;
     let eth_url = app_cfg.eth_node.ws_url;
@@ -30,14 +40,37 @@ async fn main() -> Result<()> {
         .expect("Failed to connect to NATS server. Please check the server_url.");
 
     // Subscribe and forward events
-    let mut stream = uniswap_v2.subscribe_pair_created().await?;
+    let mut stream_event = uniswap_v2.subscribe_pair_created_event().await?;
     info!("Listening for PairCreated events…");
-    while let Some(rpc_log) = stream.next().await {
+    while let Some(rpc_log) = stream_event.next().await {
         let primitives_log = rpc_log.clone().into();
         let decode_log = UniswapV2Factory::PairCreated::decode_log(&primitives_log);
         match decode_log {
             Ok(event) => {
-                let payload = json!({"raw": rpc_log,"decoded": event});
+                let payload = json!({"rpc_log": rpc_log,"decode_log": event});
+                let msg = serde_json::to_string(&payload)?;
+                info!("Sending event: {msg}");
+                mq_client.produce_record(msg).await?;
+            }
+            Err(e) => warn!("Decode failed: {e}"),
+        }
+    }
+    Ok(())
+}
+
+async fn run_sync_event(app_cfg: AppConfig) -> Result<()> {
+    let uniswap = uni::UniswapV2::new(&app_cfg.eth_node.ws_url, Address::ZERO).await?;
+    let mq_client = mq::MqClient::new(&app_cfg.nats.server_url, &app_cfg.nats.subject_name).await?;
+
+    let mut stream_event = uniswap.subscribe_sync_event().await?;
+    info!("Listening for Sync events…");
+
+    while let Some(rpc_log) = stream_event.next().await {
+        let primitives_log = rpc_log.clone().into();
+        let decode_log = UniswapV2Pair::Sync::decode_log(&primitives_log);
+        match decode_log {
+            Ok(event) => {
+                let payload = json!({"rpc_log": rpc_log,"decode_log": event});
                 let msg = serde_json::to_string(&payload)?;
                 info!("Sending event: {msg}");
                 mq_client.produce_record(msg).await?;

@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = [ "crates/enrich-pair","crates/source-uniswap"]
+members = ["crates/enrich-pair", "crates/source-uniswap"]
 
 [workspace.package]
 version = "0.1.0"
@@ -40,15 +40,6 @@ tokio = { version = "1.47.1", default-features = false, features = [
 # date and time handling
 # chrono = { version = "0.4.41", default-features = false }
 
-# Ethereum
-# alloy = { version = "1.0.25", features = ["full"] }
-alloy = { version = "1.0.25", default-features = false, features = [
-    "std",
-    "provider-ws",
-    "rpc-types",
-    "contract",
-] }
-
 # Stream
 futures-util = { version = "0.3.31", default-features = false, features = [
     "async-await",
@@ -58,3 +49,6 @@ futures-util = { version = "0.3.31", default-features = false, features = [
 async-nats = { version = "0.42.0", default-features = false, features = [
     "ring",
 ] }
+
+# Ethereum
+alloy = { version = "1.0.25", default-features = false }
