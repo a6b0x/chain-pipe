@@ -1,0 +1,6 @@
+[package]
+name = "price-injector"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]

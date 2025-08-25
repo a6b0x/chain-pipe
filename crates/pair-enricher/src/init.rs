@@ -52,8 +52,8 @@ struct Cli {
 impl AppConfig {
     pub fn from_file_or_cli() -> Result<Self> {
         let cli = Cli::parse();
-        let config_path1 = Path::new("config/enrich-pair.toml");
-        let config_path2 = Path::new("enrich-pair.toml");
+        let config_path1 = Path::new("config/pair-enricher.toml");
+        let config_path2 = Path::new("pair-enricher.toml");
 
         let cfg: AppConfig = Config::builder()
             .add_source(File::from(config_path1).required(false))

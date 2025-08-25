@@ -1,8 +1,8 @@
-use alloy::primitives::{keccak256, Address, Uint, B256, U256};
+use alloy::primitives::{Address, U256};
 use alloy::providers::{DynProvider, Provider, ProviderBuilder};
 use alloy::sol;
 use eyre::Result;
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::str::FromStr;
 
 sol!(

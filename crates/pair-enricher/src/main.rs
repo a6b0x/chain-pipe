@@ -1,10 +1,9 @@
-use alloy::primitives::{keccak256, Address, Uint, B256, U256};
+use alloy::primitives::Address;
 use eyre::{Ok, Result};
 use futures_util::StreamExt;
-use serde::{Deserialize, Serialize};
-use serde_json::json;
+use serde::Deserialize;
 use std::str::FromStr;
-use tracing::{info, warn};
+use tracing::info;
 
 mod erc20;
 mod init;
@@ -12,7 +11,7 @@ mod mq;
 
 #[derive(Deserialize)]
 struct EventMsg {
-    decoded: PairCreated,
+    decode_log: PairCreated,
 }
 #[derive(Deserialize)]
 struct PairCreated {
@@ -51,15 +50,15 @@ async fn main() -> Result<()> {
             serde_json::from_str(&text).map_err(|e| eyre::eyre!("invalid json: {e}"))?;
         info!(
             "pair = {}, token0 = {}, token1 = {}",
-            evt.decoded.pair, evt.decoded.token0, evt.decoded.token1
+            evt.decode_log.pair, evt.decode_log.token0, evt.decode_log.token1
         );
 
         let (t0, t1) = tokio::join!(
-            erc20::Token::new(&evt.decoded.token0, &http_provider),
-            erc20::Token::new(&evt.decoded.token1, &http_provider),
+            erc20::Token::new(&evt.decode_log.token0, &http_provider),
+            erc20::Token::new(&evt.decode_log.token1, &http_provider),
         );
 
-        let pair_addr = evt.decoded.pair.clone();
+        let pair_addr = evt.decode_log.pair.clone();
         let pair = erc20::Pair {
             address: Address::from_str(&pair_addr)?,
             token0: t0?,
@@ -67,7 +66,7 @@ async fn main() -> Result<()> {
         };
         let value = serde_json::to_vec(&pair)?;
 
-        kv.put(evt.decoded.pair, value.into()).await?;
+        kv.put(evt.decode_log.pair, value.into()).await?;
         info!("put pair {} to kv store", pair_addr);
 
         msg.ack()

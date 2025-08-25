@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["crates/enrich-pair", "crates/source-uniswap"]
+members = ["crates/pair-enricher", "crates/price-injector", "crates/uniswap-source"]
 
 [workspace.package]
 version = "0.1.0"

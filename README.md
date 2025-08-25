@@ -4,22 +4,22 @@ Dataflow-driven filtering and on-chain event listening.
 ```bash
 cd chain-pipe/
 
-cargo run --bin source-uniswap pair-created-event \
+cargo run --bin uniswap-source pair-created-event \
   --ws-url wss://reth-ethereum.ithaca.xyz/ws \
   --factory-address 0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f \
   --server-url nats-server:4222 \
   --subject-name eth.univ2.factory.pair_created.0
 
-cargo run --bin source-uniswap sync-event \
+cargo run --bin uniswap-source sync-event \
   --ws-url wss://reth-ethereum.ithaca.xyz/ws \
   --server-url nats-server:4222 \
   --subject-name eth.univ2.pair.sync.0
 
-cargo run --bin enrich-pair -- \
+cargo run --bin pair-enricher -- \
   --http-url https://reth-ethereum.ithaca.xyz/rpc \
   --server-url nats-server:4222 \
-  --subject-input eth.univ2.pair_created.0 \
-  --stream-name ETH_UNIV2_EVENTS \
+  --subject-input eth.univ2.factory.pair_created.0 \
+  --stream-name ETH_UNIV2_FACTORY \
   --kv-bucket univ2_new_pairs
 
 ```
@@ -50,7 +50,9 @@ nats --server=nats-server:4222 \
   consumer next ETH_UNIV2_PAIR consumer-test --count=10
 
 nats --server=nats-server:4222 account info  
+nats --server=nats-server:4222 kv rm univ2_new_pairs
+nats --server=nats-server:4222 kv ls
 nats --server=nats-server:4222 kv get --raw univ2_new_pairs 0x538e4c324a97ccd381383b3ac6200cd3a47f6ed9
-nats --server=nats-server:4222 kv history univ2_new_pairs 0xc952cd23b0c053edb74a8e4ee2f7d254bcefe158
+nats --server=nats-server:4222 kv history univ2_new_pairs 0x48cf2c7c0e3c90793a1a3459cb49720da1a10071 
 
 ```

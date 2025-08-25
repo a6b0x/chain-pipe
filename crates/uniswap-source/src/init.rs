@@ -3,7 +3,7 @@ use config::{Config, File};
 use eyre::Result;
 use serde::Deserialize;
 use std::path::Path;
-use tracing::{debug, Level};
+use tracing::debug;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
 #[derive(Debug, Deserialize)]
@@ -66,8 +66,8 @@ impl AppConfig {
     pub fn from_file_or_cli() -> Result<(AppConfig, Commands)> {
         let cli = Cli::parse();
         let cmd = cli.command.clone();
-        let config_path1 = Path::new("config/source-uniswap.toml");
-        let config_path2 = Path::new("source-uniswap.toml");
+        let config_path1 = Path::new("config/uniswap-source.toml");
+        let config_path2 = Path::new("uniswap-source.toml");
 
         let mut builder = Config::builder()
             .add_source(File::from(config_path1).required(false))

@@ -1,28 +1,25 @@
 [package]
-name = "source-uniswap"
+name = "pair-enricher"
 version.workspace = true
 edition.workspace = true
 
 [[bin]]
-name = "source-uniswap"
+name = "pair-enricher"
 path = "src/main.rs"
 
 [dependencies]
-clap  = { workspace = true }
+clap = { workspace = true }
 config = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 eyre = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true }
-# fluvio = { workspace = true }
 tokio = { workspace = true }
-# chrono = { workspace = true }
-alloy = { workspace = true, features = [
-    "std",
-    "provider-ws",
-    "rpc-types",
-    "contract",
-] }
+async-nats = { workspace = true, features = ["ring"] }
 futures-util = { workspace = true }
-async-nats = { workspace = true }
+alloy = { workspace = true, features = [
+    "contract",
+    "provider-http",
+    "reqwest",
+] }
