@@ -1,0 +1,6 @@
+[nats]
+server_url = "nats-server:4222"
+subject_input = "eth.univ2.pair.sync.0"
+subject_output = "eth.univ2.pair.sync.1"
+kv_bucket = "univ2_new_pairs"
+stream_name = "ETH_UNIV2_PAIR"

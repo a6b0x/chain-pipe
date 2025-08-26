@@ -48,11 +48,6 @@ async fn main() -> Result<()> {
 
         let evt: EventMsg =
             serde_json::from_str(&text).map_err(|e| eyre::eyre!("invalid json: {e}"))?;
-        info!(
-            "pair = {}, token0 = {}, token1 = {}",
-            evt.decode_log.pair, evt.decode_log.token0, evt.decode_log.token1
-        );
-
         let (t0, t1) = tokio::join!(
             erc20::Token::new(&evt.decode_log.token0, &http_provider),
             erc20::Token::new(&evt.decode_log.token1, &http_provider),

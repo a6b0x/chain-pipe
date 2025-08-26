@@ -2858,6 +2858,19 @@ dependencies = [
 [[package]]
 name = "price-injector"
 version = "0.1.0"
+dependencies = [
+ "alloy",
+ "async-nats",
+ "clap",
+ "config",
+ "eyre",
+ "futures-util",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+]
 
 [[package]]
 name = "primitive-types"

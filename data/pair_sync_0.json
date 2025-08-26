@@ -1,0 +1,21 @@
+{
+    "decode_log": {
+        "address": "0x2621cc0b3f3c079c1db0e80794aa24976f0b9e3c",
+        "reserve0": "0x678b0318ceaa0673f4a7ba",
+        "reserve1": "0x696c54ffbd62c1bcf033d"
+    },
+    "rpc_log": {
+        "address": "0x2621cc0b3f3c079c1db0e80794aa24976f0b9e3c",
+        "blockHash": "0xa7d784868dae07c335eaabf27ff7ac4b5450580922391d9282da6b0638051ced",
+        "blockNumber": "0x1623b7c",
+        "blockTimestamp": "0x68abc2c7",
+        "data": "0x000000000000000000000000000000000000000000678b0318ceaa0673f4a7ba0000000000000000000000000000000000000000000696c54ffbd62c1bcf033d",
+        "logIndex": "0x2c1",
+        "removed": false,
+        "topics": [
+            "0x1c411e9a96e071241c2f21f7726b17ae89e3cab4c78be50e062b03a9fffbbad1"
+        ],
+        "transactionHash": "0xbde6b33eb55bdf776c01a96a0fa803091101dfaf8bfb229265024cf8ed9270d2",
+        "transactionIndex": "0x13e"
+    }
+}
