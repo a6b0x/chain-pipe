@@ -8,48 +8,28 @@ edition = "2021"
 
 [workspace.dependencies]
 # Configuration
-clap = { version = "4.5.42", default-features = false, features = [
-    "derive", # Derive Parser/Args via struct attributes
-    "std",    # Basic std support without color/help suggestions bloat
-] }
-config = "0.15.13" # TOML/ENV hierarchical config loader
+clap = { version = "4.5.42", default-features = false}
+config = { version = "0.15.13", default-features = false } # TOML/ENV hierarchical config loader
 
 # Serialization
-serde = { version = "1.0.219", features = ["derive"] } # Struct ⇄ JSON/TOML/CSV
-serde_json = "1.0.142"                                 # JSON de/serialization
+serde = { version = "1.0.219"} # Struct ⇄ JSON/TOML/CSV
+serde_json = "1.0.142"  # JSON de/serialization
 
 # Error handling
 eyre = "0.6.12" # Context-rich anyhow-style errors
 
 # Logging & Tracing
 tracing = "0.1.41" # Structured, scoped, async-aware logging facade
-tracing-subscriber = { version = "0.3.19", default-features = false, features = [
-    "env-filter", # Enable filtering via RUST_LOG environment variable
-    "fmt",        # Console formatter with colors and compact/json output
-    "ansi",       # Optional colored output (can be disabled at runtime)
-] }
-
-# Dataflow
-# fluvio = { version = "0.50.1", default-features = false }
+tracing-subscriber = { version = "0.3.19", default-features = false}
 
 # Async runtime
-tokio = { version = "1.47.1", default-features = false, features = [
-    "rt-multi-thread",
-    "macros",
-] }
-
-# date and time handling
-# chrono = { version = "0.4.41", default-features = false }
+tokio = { version = "1.47.1", default-features = false}
 
 # Stream
-futures-util = { version = "0.3.31", default-features = false, features = [
-    "async-await",
-] }
+futures-util = { version = "0.3.31", default-features = false}
 
 # Message Queue
-async-nats = { version = "0.42.0", default-features = false, features = [
-    "ring",
-] }
+async-nats = { version = "0.42.0", default-features = false}
 
 # Ethereum
 alloy = { version = "1.0.25", default-features = false }

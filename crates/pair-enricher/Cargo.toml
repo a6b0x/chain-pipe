@@ -8,17 +8,24 @@ name = "pair-enricher"
 path = "src/main.rs"
 
 [dependencies]
-clap = { workspace = true }
-config = { workspace = true }
-serde = { workspace = true }
+clap = { workspace = true, features = [
+    "derive", # Derive Parser/Args via struct attributes
+    "std",    # Basic std support without color/help suggestions bloat
+] }
+config = { workspace = true, features = ["toml"] }
+serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 eyre = { workspace = true }
 tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
-tokio = { workspace = true }
+tracing-subscriber = { workspace = true, features = [
+    "env-filter", # Enable filtering via RUST_LOG environment variable
+    "fmt",        # Console formatter with colors and compact/json output
+    "ansi",       # Optional colored output (can be disabled at runtime)
+] }
+tokio = { workspace = true, features = ["rt-multi-thread", "macros"] }
 
 async-nats = { workspace = true, features = ["ring"] }
-futures-util = { workspace = true }
+futures-util = { workspace = true, features = ["async-await"] }
 alloy = { workspace = true, features = [
     "contract",
     "provider-http",

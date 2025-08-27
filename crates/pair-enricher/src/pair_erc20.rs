@@ -13,6 +13,15 @@ sol!(
     "abi/ERC20.json"
 );
 
+sol!(
+    #[allow(clippy::too_many_arguments)]
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    #[derive(Debug, Serialize)]
+    UniswapV2Pair,
+    "abi/UniswapV2Pair.json"
+);
+
 pub struct ERC20 {
     pub http_provider: DynProvider,
 }
@@ -55,6 +64,21 @@ impl Token {
             decimals,
             symbol,
             total_supply,
+        })
+    }
+}
+
+impl Pair {
+    pub async fn new(pair_address: &str, http_provider: &DynProvider) -> Result<Self> {
+        let address = Address::from_str(pair_address)?;
+        let contract = UniswapV2Pair::new(address, http_provider);
+        let token0 = contract.token0().call().await?;
+        let token1 = contract.token1().call().await?;
+
+        Ok(Pair {
+            address,
+            token0: Token::new(&token0.to_string(), http_provider).await?,
+            token1: Token::new(&token1.to_string(), http_provider).await?,
         })
     }
 }

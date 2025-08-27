@@ -5,13 +5,17 @@ edition.workspace = true
 
 [dependencies]
 clap = { workspace = true, features = ["derive", "std"] }
-config = { workspace = true }
+config = { workspace = true, features = ["toml"] }
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
 eyre = { workspace = true }
 tracing = { workspace = true }
-tracing-subscriber = { workspace = true, features = ["env-filter", "fmt", "ansi"] }
-tokio = { workspace = true }
+tracing-subscriber = { workspace = true, features = [
+    "env-filter",
+    "fmt",
+    "ansi",
+] }
+tokio = { workspace = true, features = ["rt-multi-thread"] }
 async-nats = { workspace = true, features = ["ring"] }
 futures-util = { workspace = true, features = ["async-await"] }
 alloy = { workspace = true, features = ["std", "serde"] }

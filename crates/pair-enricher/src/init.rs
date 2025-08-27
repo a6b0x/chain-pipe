@@ -10,6 +10,7 @@ use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 pub struct AppConfig {
     pub eth_node: EthNodeConfig,
     pub nats: NatsConfig,
+    pub uniswap_v2: UniswapV2Config,
     pub log: Option<LogConfig>,
 }
 
@@ -25,6 +26,11 @@ pub struct NatsConfig {
     pub kv_bucket: String,
     pub subject_output: String,
     pub stream_name: String,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct UniswapV2Config {
+    pub pair_address: Option<Vec<String>>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -47,6 +53,8 @@ struct Cli {
     kv_bucket: Option<String>,
     #[arg(long)]
     stream_name: Option<String>,
+    #[arg(long)]
+    pair_address: Option<Vec<String>>,
 }
 
 impl AppConfig {
@@ -64,6 +72,7 @@ impl AppConfig {
             .set_override_option("nats.subject_output", cli.subject_output)?
             .set_override_option("nats.kv_bucket", cli.kv_bucket)?
             .set_override_option("nats.stream_name", cli.stream_name)?
+            .set_override_option("uniswap_v2.pair_address", cli.pair_address)?
             .build()
             .map_err(eyre::Report::from)?
             .try_deserialize()?;

@@ -1,7 +1,7 @@
-use alloy::primitives::{Address, U256};
+use alloy::primitives::{Address, FixedBytes, U256};
 use eyre::{Ok, Result};
 use futures_util::StreamExt;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::str::from_utf8;
 use tracing::{info, warn};
 
@@ -12,26 +12,26 @@ mod mq;
 struct EventMsg {
     decode_log: SyncEvent,
 }
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 struct SyncEvent {
     address: Address,
     reserve0: U256,
     reserve1: U256,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Pair {
     pub address: String,
     pub token0: Token,
     pub token1: Token,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Serialize)]
 pub struct Token {
     pub address: String,
     pub decimals: u8,
     pub symbol: String,
-    pub total_supply: u128,
+    pub total_supply: U256,
 }
 
 #[tokio::main]
@@ -43,6 +43,7 @@ async fn main() -> Result<()> {
     let mq_client = mq::MqClient::new(
         &app_cfg.nats.server_url,
         &app_cfg.nats.subject_input,
+        &app_cfg.nats.subject_output,
         &app_cfg.nats.stream_name,
     )
     .await?;
@@ -77,8 +78,19 @@ async fn main() -> Result<()> {
                 * 10f64.powi(pair.token0.decimals as i32 - pair.token1.decimals as i32);
             let price1 = 1.0 / price0;
 
-            info!("pair: {pair:#?}, reserve0: {reserve0}, reserve1: {reserve1}, price0: {price0}, price1: {price1}");
+            let price_msg = serde_json::json!({
+                "pair": pair,
+                "decode_log": event.decode_log,
+                "price0": price0,
+                "price1": price1,
+            });
+
+            mq_client.produce_record(price_msg.to_string()).await?;
+            info!("price msg: {price_msg}");
         }
+        msg.ack()
+            .await
+            .map_err(|e| eyre::eyre!("ack message failed: {e}"))?;
     }
 
     Ok(())

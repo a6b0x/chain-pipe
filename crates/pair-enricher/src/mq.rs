@@ -40,6 +40,7 @@ impl MqClient {
 
         let consumer = stream
             .create_consumer(async_nats::jetstream::consumer::pull::Config {
+                durable_name: Some("pair-enricher".to_string()),
                 deliver_policy: if from_start {
                     DeliverPolicy::All
                 } else {

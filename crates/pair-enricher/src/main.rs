@@ -5,9 +5,9 @@ use serde::Deserialize;
 use std::str::FromStr;
 use tracing::info;
 
-mod erc20;
 mod init;
 mod mq;
+mod pair_erc20;
 
 #[derive(Deserialize)]
 struct EventMsg {
@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
     app_cfg.init_log()?;
     info!("starting enrich-pair with config: {app_cfg:#?}");
 
-    let http_provider = erc20::ERC20::new(&app_cfg.eth_node.http_url)
+    let http_provider = pair_erc20::ERC20::new(&app_cfg.eth_node.http_url)
         .await?
         .http_provider;
 
@@ -37,8 +37,18 @@ async fn main() -> Result<()> {
     )
     .await?;
 
-    let mut sub = mq_client.jetstream_pull_from(true).await?;
     let kv = mq_client.kv_store(&app_cfg.nats.kv_bucket).await?;
+    if let Some(addrs) = &app_cfg.uniswap_v2.pair_address {
+        for addr in addrs {
+            let pair_addr = Address::from_str(addr)?;
+            let pair = pair_erc20::Pair::new(addr, &http_provider).await?;
+            let value = serde_json::to_vec(&pair)?;
+            kv.put(addr.clone(), value.into()).await?;
+            info!("put pair {} to kv store", addr);
+        }
+    }
+
+    let mut sub = mq_client.jetstream_pull_from(true).await?;
     info!("listening on {}", app_cfg.nats.subject_input);
 
     while let Some(msg_result) = sub.next().await {
@@ -49,12 +59,12 @@ async fn main() -> Result<()> {
         let evt: EventMsg =
             serde_json::from_str(&text).map_err(|e| eyre::eyre!("invalid json: {e}"))?;
         let (t0, t1) = tokio::join!(
-            erc20::Token::new(&evt.decode_log.token0, &http_provider),
-            erc20::Token::new(&evt.decode_log.token1, &http_provider),
+            pair_erc20::Token::new(&evt.decode_log.token0, &http_provider),
+            pair_erc20::Token::new(&evt.decode_log.token1, &http_provider),
         );
 
         let pair_addr = evt.decode_log.pair.clone();
-        let pair = erc20::Pair {
+        let pair = pair_erc20::Pair {
             address: Address::from_str(&pair_addr)?,
             token0: t0?,
             token1: t1?,

@@ -20,7 +20,15 @@ cargo run --bin pair-enricher -- \
   --server-url nats-server:4222 \
   --subject-input eth.univ2.factory.pair_created.0 \
   --stream-name ETH_UNIV2_FACTORY \
-  --kv-bucket univ2_new_pairs
+  --kv-bucket univ2_new_pairs \
+  --pair-address 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc 
+
+  cargo run --bin price-injector -- \
+  --server-url nats-server:4222 \
+  --subject-input eth.univ2.pair.sync.0 \
+  --subject-output eth.univ2.pair.sync.1 \
+  --stream-name ETH_UNIV2_PAIR \
+  --kv-bucket univ2_new_pairs 
 
 ```
 
@@ -41,10 +49,13 @@ nats --server=nats-server:4222 stream ls
 nats --server=nats-server:4222 stream info ETH_UNIV2_PAIR
 nats --server=nats-server:4222 sub eth.univ2.factory.pair_created.0
 nats --server=nats-server:4222 sub eth.univ2.pair.sync.0
+nats --server=nats-server:4222 sub eth.univ2.pair.sync.1
 
 nats consumer add -h
 nats --server=nats-server:4222 consumer add ETH_UNIV2_PAIR consumer-test \
 --defaults
+nats --server=nats-server:4222 consumer ls ETH_UNIV2_FACTORY
+nats --server=nats-server:4222 consumer rm ETH_UNIV2_PAIR N0eflR28
 
 nats --server=nats-server:4222 \
   consumer next ETH_UNIV2_PAIR consumer-test --count=10

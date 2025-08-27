@@ -8,19 +8,34 @@ use futures_util::StreamExt;
 pub struct MqClient {
     nats: Client,
     subject_input: String,
+    subject_output: String,
     stream_name: String,
 }
 
 impl MqClient {
-    pub async fn new(server_url: &str, subject_name: &str, stream_name: &str) -> Result<Self> {
+    pub async fn new(
+        server_url: &str,
+        subject_input: &str,
+        subject_output: &str,
+        stream_name: &str,
+    ) -> Result<Self> {
         let client = async_nats::connect(server_url)
             .await
             .map_err(|e| eyre::eyre!("NATS connect failed: {}", e))?;
         Ok(Self {
             nats: client,
-            subject_input: subject_name.to_string(),
+            subject_input: subject_input.to_string(),
+            subject_output: subject_output.to_string(),
             stream_name: stream_name.to_string(),
         })
+    }
+
+    pub async fn produce_record(&self, record: String) -> Result<()> {
+        self.nats
+            .publish(self.subject_output.clone(), record.into())
+            .await
+            .map_err(|e| eyre::eyre!("NATS publish failed: {}", e))?;
+        Ok(())
     }
 
     pub async fn jetstream_pull_from(
@@ -36,6 +51,7 @@ impl MqClient {
 
         let consumer = stream
             .create_consumer(async_nats::jetstream::consumer::pull::Config {
+                durable_name: Some("price-injector".to_string()),
                 deliver_policy: if from_start {
                     DeliverPolicy::All
                 } else {
