@@ -1,0 +1,8 @@
+[package]
+name = "chain-model"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+alloy = { workspace = true, features = ["std"] }

@@ -8,6 +8,8 @@ name = "uniswap-source"
 path = "src/main.rs"
 
 [dependencies]
+chain-model = { path = "../chain-model" }
+
 clap = { workspace = true, features = [
     "derive", # Derive Parser/Args via struct attributes
     "std",    # Basic std support without color/help suggestions bloat
