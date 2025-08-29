@@ -21,7 +21,8 @@ cargo run --bin pair-enricher -- \
   --subject-input eth.univ2.factory.pair_created.0 \
   --stream-name ETH_UNIV2_FACTORY \
   --kv-bucket univ2_new_pairs \
-  --pair-address 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc 
+  --pair-address 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc \
+  --pair-address 0x0d4a11d5EEaaC28EC3F61d100daF4d40471f1852
 
   cargo run --bin price-injector -- \
   --server-url nats-server:4222 \

@@ -2532,6 +2532,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "async-nats",
+ "chain-model",
  "clap",
  "config",
  "eyre",
@@ -2726,6 +2727,7 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "async-nats",
+ "chain-model",
  "clap",
  "config",
  "eyre",

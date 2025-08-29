@@ -5,34 +5,10 @@ use serde::{Deserialize, Serialize};
 use std::str::from_utf8;
 use tracing::{info, warn};
 
+use chain_model::{Pair, PriceTick, SyncEvent};
+
 mod init;
 mod mq;
-
-#[derive(Debug, Deserialize)]
-struct EventMsg {
-    decode_log: SyncEvent,
-}
-#[derive(Debug, Deserialize, Serialize)]
-struct SyncEvent {
-    address: Address,
-    reserve0: U256,
-    reserve1: U256,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Pair {
-    pub address: String,
-    pub token0: Token,
-    pub token1: Token,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct Token {
-    pub address: String,
-    pub decimals: u8,
-    pub symbol: String,
-    pub total_supply: U256,
-}
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -54,9 +30,9 @@ async fn main() -> Result<()> {
     while let Some(msg_result) = sub.next().await {
         let msg = msg_result?;
 
-        let event: EventMsg = serde_json::from_slice(&msg.payload)?;
+        let event: SyncEvent = serde_json::from_slice(&msg.payload)?;
 
-        let entry = kv.entry(event.decode_log.address.to_string()).await?;
+        let entry = kv.entry(event.pair.to_string()).await?;
         if let Some(entry) = entry {
             info!(
                 "{} @ {} -> {}",
@@ -67,26 +43,35 @@ async fn main() -> Result<()> {
 
             let pair: Pair = serde_json::from_slice(&entry.value)?;
 
-            let reserve0 = event.decode_log.reserve0.to::<u128>() as f64;
-            let reserve1 = event.decode_log.reserve1.to::<u128>() as f64;
+            let reserve0 = event.reserve0.to_string().parse::<f64>()?;
+            let reserve1 = event.reserve1.to_string().parse::<f64>()?;
 
             if reserve0 == 0.0 {
                 warn!("reserve0 is zero, skip");
                 continue;
             }
-            let price0 = (reserve1 / reserve0)
+            let t1_t0 = (reserve1 / reserve0)
                 * 10f64.powi(pair.token0.decimals as i32 - pair.token1.decimals as i32);
-            let price1 = 1.0 / price0;
+            let t0_t1 = 1.0 / t1_t0;
 
-            let price_msg = serde_json::json!({
-                "pair": pair,
-                "decode_log": event.decode_log,
-                "price0": price0,
-                "price1": price1,
-            });
+            let price_msg = PriceTick {
+                pair_address: event.pair.to_string(),
+                token0: pair.token0.address.to_string(),
+                token1: pair.token1.address.to_string(),
+                reserve0: event.reserve0.to_string(),
+                reserve1: event.reserve1.to_string(),
+                t1_t0,
+                t0_t1,
+                symbol0: pair.token0.symbol,
+                symbol1: pair.token1.symbol,
+                transaction_hash: event.transaction_hash.to_string(),
+                block_number: event.block_number,
+                block_timestamp: event.block_timestamp,
+            };
 
-            mq_client.produce_record(price_msg.to_string()).await?;
-            info!("price msg: {price_msg}");
+            let payload = serde_json::to_string(&price_msg)?;
+            mq_client.produce_record(payload).await?;
+            info!("price msg: {price_msg:?}");
         }
         msg.ack()
             .await

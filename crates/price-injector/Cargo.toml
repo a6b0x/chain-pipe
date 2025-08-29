@@ -4,6 +4,7 @@ version.workspace = true
 edition.workspace = true
 
 [dependencies]
+chain-model = { path = "../chain-model" }
 clap = { workspace = true, features = ["derive", "std"] }
 config = { workspace = true, features = ["toml"] }
 serde = { workspace = true, features = ["derive"] }

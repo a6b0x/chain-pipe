@@ -6,7 +6,7 @@ use serde_json::json;
 use std::str::FromStr;
 use tracing::{info, warn};
 
-use chain_model::SyncEvent;
+use chain_model::{PairCreatedEvent, SyncEvent};
 use init::AppConfig;
 use init::Commands;
 use uni::{UniswapV2Factory, UniswapV2Pair};
@@ -48,7 +48,15 @@ async fn run_pair_created(app_cfg: AppConfig) -> Result<()> {
         let decode_log = UniswapV2Factory::PairCreated::decode_log(&primitives_log);
         match decode_log {
             Ok(event) => {
-                let payload = json!({"rpc_log": rpc_log,"decode_log": event});
+                //let payload = json!({"rpc_log": rpc_log,"decode_log": event});
+                let payload = PairCreatedEvent {
+                    pair: event.pair,
+                    token0: event.token0,
+                    token1: event.token1,
+                    transaction_hash: rpc_log.transaction_hash.unwrap_or_default(),
+                    block_number: rpc_log.block_number.unwrap_or_default(),
+                    block_timestamp: rpc_log.block_timestamp.unwrap_or_default(),
+                };
                 let msg = serde_json::to_string(&payload)?;
                 info!("Sending event: {msg}");
                 mq_client.produce_record(msg).await?;
@@ -73,11 +81,10 @@ async fn run_sync_event(app_cfg: AppConfig) -> Result<()> {
             Ok(event) => {
                 // let payload = json!({"rpc_log": rpc_log,"decode_log": event});
                 let payload = SyncEvent {
-                    pair_address: event.address,
-                    pair_reserve0: event.reserve0,
-                    pair_reserve1: event.reserve1,
+                    pair: event.address,
+                    reserve0: event.reserve0,
+                    reserve1: event.reserve1,
                     transaction_hash: rpc_log.transaction_hash.unwrap_or_default(),
-                    block_hash: rpc_log.block_hash.unwrap_or_default(),
                     block_number: rpc_log.block_number.unwrap_or_default(),
                     block_timestamp: rpc_log.block_timestamp.unwrap_or_default(),
                 };
