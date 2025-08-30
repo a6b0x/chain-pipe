@@ -44,14 +44,18 @@ pub struct Pair {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct PriceTick {
     pub pair_address: String,
-    pub token0: String,
-    pub token1: String,
-    pub reserve0: String, // Stored as string for full precision
-    pub reserve1: String, // Stored as string for full precision
-    pub t1_t0: f64,       // For quick, less-precise views
-    pub t0_t1: f64,
-    pub symbol0: String,
-    pub symbol1: String,
+
+    pub token0_address: String,
+    pub token0_reserve: String, // Stored as string for full precision
+    pub token0_symbol: String,
+
+    pub token1_address: String,
+    pub token1_reserve: String, // Stored as string for full precision
+    pub token1_symbol: String,
+
+    pub token0_token1: f64,
+    pub token1_token0: f64,
+
     pub transaction_hash: String,
     pub block_number: u64,
     pub block_timestamp: u64,

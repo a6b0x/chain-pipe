@@ -1,6 +1,6 @@
 use async_nats::{
     jetstream::{self, consumer::DeliverPolicy, kv::Store},
-    Client, Subscriber,
+    Client,
 };
 use eyre::{Result, WrapErr};
 use futures_util::StreamExt;
