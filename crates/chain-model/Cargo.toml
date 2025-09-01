@@ -5,4 +5,4 @@ edition.workspace = true
 
 [dependencies]
 serde = { workspace = true, features = ["derive"] }
-alloy = { workspace = true, features = ["std"] }
+alloy = { workspace = true, features = ["std", "serde"] }

@@ -1,0 +1,10 @@
+[nats]
+server_url = "nats-server:4222"
+subject_name = "eth.univ2.pair.sync.1"
+stream_name = "ETH_UNIV2_PAIR"
+
+[timescale]
+dsn = "postgres://postgres:postgres@localhost:5432/prices"
+
+[log]
+level = "debug"

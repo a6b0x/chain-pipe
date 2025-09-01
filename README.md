@@ -31,6 +31,12 @@ cargo run --bin pair-enricher -- \
   --stream-name ETH_UNIV2_PAIR \
   --kv-bucket univ2_new_pairs 
 
+  cargo run --bin price-sink -- \
+  --server-url nats-server:4222 \
+  --subject-name eth.univ2.pair.sync.1 \
+  --stream-name ETH_UNIV2_PAIR \
+  --dsn postgres://postgres:password@localhost:5432/prices
+
 ```
 
 ```bash

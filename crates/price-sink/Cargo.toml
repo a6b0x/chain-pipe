@@ -1,5 +1,5 @@
 [package]
-name = "price-injector"
+name = "price-sink"
 version.workspace = true
 edition.workspace = true
 
@@ -19,6 +19,5 @@ tracing-subscriber = { workspace = true, features = [
 ] }
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 
+tokio-postgres = { workspace = true, features = ["with-chrono-0_4", "runtime"] }
 async-nats = { workspace = true, features = ["ring"] }
-futures-util = { workspace = true, features = ["async-await"] }
-alloy = { workspace = true, features = ["std", "serde"] }

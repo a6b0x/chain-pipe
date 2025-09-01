@@ -4,3 +4,4 @@ docker/fluvio/metadata/*
 docker/fluvio/data/*
 docker/arroyo/data/*
 docker/nats/data/*
+docker/pg/data/*
