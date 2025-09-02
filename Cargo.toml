@@ -35,5 +35,7 @@ futures-util = { version = "0.3.31", default-features = false }
 async-nats = { version = "0.42.0", default-features = false }
 # Ethereum
 alloy = { version = "1.0.25", default-features = false }
-# DB
+# TSDB
 tokio-postgres = { version = "0.7.13", default-features = false }
+deadpool-postgres = { version = "0.14.1", default-features = false }
+chrono = { version = "0.4.41", default-features = false }

@@ -39,6 +39,36 @@ cargo run --bin pair-enricher -- \
 
 ```
 
+```sql
+psql -d "postgres://postgres:password@localhost/postgres"
+\l
+\c testdb
+ \dt
+
+CREATE TABLE price_ticks (
+  time TIMESTAMPTZ NOT NULL,
+
+  pair_address TEXT NOT NULL,
+  token0_address TEXT NOT NULL,
+  token0_symbol TEXT NOT NULL,
+  token0_reserve TEXT NOT NULL, 
+  token1_address TEXT NOT NULL,
+  token1_symbol TEXT NOT NULL,
+  token1_reserve TEXT NOT NULL, 
+
+  token0_token1 DOUBLE PRECISION NOT NULL, 
+  token1_token0 DOUBLE PRECISION NOT NULL,
+
+  block_number BIGINT NOT NULL,
+  transaction_hash TEXT NOT NULL
+);
+
+SELECT create_hypertable('price_ticks', by_range('time'));
+select time,pair_address,token1_token0,token0_token1,token0_symbol,token1_symbol from price_ticks order by time desc;
+
+```
+
+
 ```bash
 nats stream add -h
 

@@ -4,7 +4,7 @@ subject_name = "eth.univ2.pair.sync.1"
 stream_name = "ETH_UNIV2_PAIR"
 
 [timescale]
-dsn = "postgres://postgres:postgres@localhost:5432/prices"
+dsn = "postgres://postgres:password@timescaledb:5432/testdb"
 
 [log]
-level = "debug"
+level = "info"
