@@ -1,5 +1,5 @@
 use async_nats::{
-    jetstream::{self, consumer::DeliverPolicy, kv::Store},
+    jetstream::{self, consumer::DeliverPolicy},
     Client,
 };
 use eyre::{Result, WrapErr};

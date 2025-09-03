@@ -80,6 +80,7 @@ async fn run_sync_event(app_cfg: AppConfig) -> Result<()> {
         match decode_log {
             Ok(event) => {
                 // let payload = json!({"rpc_log": rpc_log,"decode_log": event});
+                // info!("Sync event: {event:?} RPC log: {rpc_log:?}");
                 let payload = SyncEvent {
                     pair: event.address,
                     reserve0: event.reserve0,

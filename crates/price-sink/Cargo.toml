@@ -20,3 +20,4 @@ async-nats = { workspace = true, features = ["ring"] }
 deadpool-postgres = { workspace = true, features = ["rt_tokio_1"] }
 chrono = { workspace = true ,features = ["serde"]}
 futures-util = { workspace = true, features = ["async-await"] }
+rust_decimal = { workspace = true, features = ["db-tokio-postgres", "std"] }

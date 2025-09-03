@@ -78,11 +78,11 @@ async fn main() -> Result<()> {
                 pair_address: event.pair.to_string(),
 
                 token0_address: pair.token0.address.to_string(),
-                token0_reserve: event.reserve0.to_string(),
+                token0_reserve: event.reserve0,
                 token0_symbol: pair.token0.symbol,
 
                 token1_address: pair.token1.address.to_string(),
-                token1_reserve: event.reserve1.to_string(),
+                token1_reserve: event.reserve1,
                 token1_symbol: pair.token1.symbol,
 
                 token0_token1,

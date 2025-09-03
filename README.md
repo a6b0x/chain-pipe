@@ -1,6 +1,11 @@
 # ChainPipe
 Dataflow-driven filtering and on-chain event listening.
 
+RPC node 
+wss://reth-ethereum.ithaca.xyz/ws
+
+wss://ethereum-rpc.publicnode.com // block_timestamp: Some(None)
+
 ```bash
 cd chain-pipe/
 
@@ -35,15 +40,16 @@ cargo run --bin pair-enricher -- \
   --server-url nats-server:4222 \
   --subject-name eth.univ2.pair.sync.1 \
   --stream-name ETH_UNIV2_PAIR \
-  --dsn postgres://postgres:password@localhost:5432/prices
+  --dsn postgres://postgres:password@timescaledb:5432/testdb
 
 ```
 
 ```sql
-psql -d "postgres://postgres:password@localhost/postgres"
+psql -d "postgres://postgres:password@localhost/testdb"
 \l
 \c testdb
- \dt
+\dt
+DROP TABLE IF EXISTS price_ticks;
 
 CREATE TABLE price_ticks (
   time TIMESTAMPTZ NOT NULL,
@@ -51,10 +57,10 @@ CREATE TABLE price_ticks (
   pair_address TEXT NOT NULL,
   token0_address TEXT NOT NULL,
   token0_symbol TEXT NOT NULL,
-  token0_reserve TEXT NOT NULL, 
+  token0_reserve NUMERIC NOT NULL, 
   token1_address TEXT NOT NULL,
   token1_symbol TEXT NOT NULL,
-  token1_reserve TEXT NOT NULL, 
+  token1_reserve NUMERIC NOT NULL, 
 
   token0_token1 DOUBLE PRECISION NOT NULL, 
   token1_token0 DOUBLE PRECISION NOT NULL,
@@ -102,5 +108,16 @@ nats --server=nats-server:4222 kv rm univ2_new_pairs
 nats --server=nats-server:4222 kv ls
 nats --server=nats-server:4222 kv get --raw univ2_new_pairs 0x538e4c324a97ccd381383b3ac6200cd3a47f6ed9
 nats --server=nats-server:4222 kv history univ2_new_pairs 0x48cf2c7c0e3c90793a1a3459cb49720da1a10071 
+
+```
+
+```bash
+# RPC Node check 
+cast logs \
+  --from-block 20000000 \
+  --to-block 20000100 \
+  --rpc-url wss://reth-ethereum.ithaca.xyz/ws \
+  --address 0xB4e16d0168e52d35CaCD2c6185b44281Ec28C9Dc \
+  "Sync(uint112,uint112)"
 
 ```

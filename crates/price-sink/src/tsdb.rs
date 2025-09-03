@@ -1,8 +1,10 @@
 use chain_model::PriceTick;
-use chrono::{DateTime, TimeZone};
+use chrono::TimeZone;
 use deadpool_postgres::{Manager, Pool};
 use eyre::{eyre, Result};
-use tokio_postgres::{Client, NoTls};
+use rust_decimal::Decimal;
+use std::str::FromStr;
+use tokio_postgres::NoTls;
 
 #[derive(Clone, Debug)]
 pub struct TsdbClient {
@@ -23,6 +25,9 @@ impl TsdbClient {
             .single()
             .ok_or_else(|| eyre!("invalid timestamp"))?;
 
+        let token0_reserve_dec = Decimal::from_str(&tick.token0_reserve.to_string())?;
+        let token1_reserve_dec = Decimal::from_str(&tick.token1_reserve.to_string())?;
+
         client
             .execute(
                 "INSERT INTO price_ticks (
@@ -37,10 +42,10 @@ impl TsdbClient {
                     &tick.pair_address,
                     &tick.token0_address,
                     &tick.token0_symbol,
-                    &tick.token0_reserve,
+                    &token0_reserve_dec,
                     &tick.token1_address,
                     &tick.token1_symbol,
-                    &tick.token1_reserve,
+                    &token1_reserve_dec,
                     &tick.token0_token1,
                     &tick.token1_token0,
                     &(tick.block_number as i64),

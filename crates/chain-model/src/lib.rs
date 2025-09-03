@@ -46,11 +46,11 @@ pub struct PriceTick {
     pub pair_address: String,
 
     pub token0_address: String,
-    pub token0_reserve: String, // Stored as string for full precision
+    pub token0_reserve: Uint<112, 2>,
     pub token0_symbol: String,
 
     pub token1_address: String,
-    pub token1_reserve: String, // Stored as string for full precision
+    pub token1_reserve: Uint<112, 2>,
     pub token1_symbol: String,
 
     pub token0_token1: f64,
