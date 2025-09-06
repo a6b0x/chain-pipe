@@ -15,9 +15,14 @@ tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["env-filter", "fmt"] }
 tokio = { workspace = true, features = ["rt-multi-thread"] }
 
-tokio-postgres = { workspace = true, features = ["with-chrono-0_4", "runtime"] }
 async-nats = { workspace = true, features = ["ring"] }
-deadpool-postgres = { workspace = true, features = ["rt_tokio_1"] }
-chrono = { workspace = true ,features = ["serde"]}
 futures-util = { workspace = true, features = ["async-await"] }
-rust_decimal = { workspace = true, features = ["db-tokio-postgres", "std"] }
+
+sqlx = { workspace = true, features = [
+    "runtime-tokio-rustls",
+    "postgres",
+    "chrono",
+    "bigdecimal",
+] }
+chrono = { workspace = true ,features = ["serde"]}
+bigdecimal  = { workspace = true, features = ["std"] }
