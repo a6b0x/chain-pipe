@@ -3,7 +3,7 @@ use config::{Config, File};
 use eyre::Result;
 use serde::Deserialize;
 use std::path::Path;
-use tracing::{debug, Level};
+use tracing::debug;
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
 #[derive(Debug, Deserialize)]

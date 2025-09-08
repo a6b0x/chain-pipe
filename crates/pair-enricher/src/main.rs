@@ -1,7 +1,6 @@
 use alloy::primitives::Address;
-use eyre::{Ok, Result};
+use eyre::Result;
 use futures_util::StreamExt;
-use serde::Deserialize;
 use std::str::FromStr;
 use tracing::info;
 
@@ -47,14 +46,23 @@ async fn main() -> Result<()> {
 
         let event: PairCreatedEvent =
             serde_json::from_slice(&msg.payload).map_err(|e| eyre::eyre!("invalid json: {e}"))?;
-        let pair = eth_reader
+        info!(
+            "fetching pair {} token0={} token1={}",
+            event.pair, event.token0, event.token1
+        );
+        match eth_reader
             .fetch_pair_token(event.pair, event.token0, event.token1)
-            .await?;
-
-        let value = serde_json::to_vec(&pair)?;
-
-        kv.put(event.pair.to_string(), value.into()).await?;
-        info!("put pair {} to kv store", event.pair);
+            .await
+        {
+            Ok(pair) => {
+                let value = serde_json::to_vec(&pair)?;
+                kv.put(event.pair.to_string(), value.into()).await?;
+                info!("put pair {} to kv store", event.pair);
+            }
+            Err(e) => {
+                tracing::warn!("skip pair {}: {}", event.pair, e);
+            }
+        };
 
         msg.ack()
             .await
