@@ -26,6 +26,7 @@ pub struct UniswapV2Config {
 pub struct NatsConfig {
     pub server_url: String,
     pub subject_name: String,
+    pub kv_bucket: Option<String>,
 }
 #[derive(Debug, Deserialize)]
 pub struct LogConfig {
@@ -59,6 +60,8 @@ pub enum Commands {
         server_url: Option<String>,
         #[arg(long)]
         subject_name: Option<String>,
+        #[arg(long)]
+        kv_bucket: Option<String>,
     },
 }
 
@@ -90,11 +93,13 @@ impl AppConfig {
                 ws_url,
                 server_url,
                 subject_name,
+                kv_bucket,
             } => {
                 builder = builder
                     .set_override_option("eth_node.ws_url", ws_url)?
                     .set_override_option("nats.server_url", server_url)?
-                    .set_override_option("nats.subject_name", subject_name)?;
+                    .set_override_option("nats.subject_name", subject_name)?
+                    .set_override_option("nats.kv_bucket", kv_bucket)?;
             }
         }
 

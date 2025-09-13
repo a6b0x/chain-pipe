@@ -2,7 +2,7 @@ use async_nats::Client;
 use eyre::Result;
 
 pub struct MqClient {
-    nats: Client,
+    pub nats: Client,
     subject_name: String,
 }
 
@@ -23,5 +23,10 @@ impl MqClient {
             .await
             .map_err(|e| eyre::eyre!("NATS publish failed: {}", e))?;
         Ok(())
+    }
+
+    pub async fn get_kv(&self, bucket: &str) -> Result<async_nats::jetstream::kv::Store> {
+        let js = async_nats::jetstream::new(self.nats.clone());
+        js.get_key_value(bucket).await.map_err(Into::into)
     }
 }

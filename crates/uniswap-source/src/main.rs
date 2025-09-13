@@ -4,7 +4,7 @@ use eyre::Result;
 use futures_util::StreamExt;
 use serde_json::json;
 use std::str::FromStr;
-use tracing::{info, warn};
+use tracing::{error, info, warn};
 
 use chain_model::{PairCreatedEvent, SyncEvent};
 use init::AppConfig;
@@ -71,7 +71,27 @@ async fn run_sync_event(app_cfg: AppConfig) -> Result<()> {
     let uniswap = uni::UniswapV2::new(&app_cfg.eth_node.ws_url, Address::ZERO).await?;
     let mq_client = mq::MqClient::new(&app_cfg.nats.server_url, &app_cfg.nats.subject_name).await?;
 
-    let mut stream_event = uniswap.subscribe_sync_event().await?;
+    let kv_bucket = app_cfg.nats.kv_bucket.unwrap_or_default();
+    let kv_store = mq_client.get_kv(&kv_bucket).await?;
+
+    let mut pair_addresses = Vec::new();
+    let mut keys = kv_store.keys().await?;
+    while let Some(key_result) = keys.next().await {
+        match key_result {
+            Ok(key) => match Address::from_str(&key) {
+                Ok(addr) => pair_addresses.push(addr),
+                Err(e) => warn!("Failed to parse key '{key}' as address: {e}"),
+            },
+            Err(e) => error!("Failed to get key from KV store: {e}"),
+        }
+    }
+    info!(
+        "Found {} pairs in KV store '{}'. Subscribing to their Sync events.",
+        pair_addresses.len(),
+        kv_bucket
+    );
+
+    let mut stream_event = uniswap.subscribe_sync_event(pair_addresses).await?;
     info!("Listening for Sync events…");
 
     while let Some(rpc_log) = stream_event.next().await {

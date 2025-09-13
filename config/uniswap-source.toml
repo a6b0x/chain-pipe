@@ -5,3 +5,4 @@ factory_address = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
 [nats]
 server_url = "nats-server:4222"
 subject_name = "eth.univ2.pair_created.0"
+kv_bucket = "univ2_new_pairs"

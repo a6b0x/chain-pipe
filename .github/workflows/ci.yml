@@ -5,6 +5,7 @@ on:
   push:
     branches: [ "master" ]
     paths:               # Trigger only when the following paths change
+     - 'crates/*/src/main.rs'
      - 'Cargo.toml'
      - 'Cargo.lock'
      - 'Dockerfile'

@@ -52,9 +52,22 @@ impl UniswapV2 {
         Ok(sub.into_stream())
     }
 
-    pub async fn subscribe_sync_event(&self) -> Result<impl StreamExt<Item = Log>> {
+    // pub async fn subscribe_sync_event(&self) -> Result<impl StreamExt<Item = Log>> {
+    //     let event_signature = UniswapV2Pair::Sync::SIGNATURE_HASH;
+    //     let filter = Filter::new().event_signature(event_signature);
+
+    //     let sub = self.ws_provider.subscribe_logs(&filter).await?;
+    //     Ok(sub.into_stream())
+    // }
+
+    pub async fn subscribe_sync_event(
+        &self,
+        pair_addresses: Vec<Address>,
+    ) -> Result<impl StreamExt<Item = Log>> {
         let event_signature = UniswapV2Pair::Sync::SIGNATURE_HASH;
-        let filter = Filter::new().event_signature(event_signature);
+        let filter = Filter::new()
+            .event_signature(event_signature)
+            .address(pair_addresses);
 
         let sub = self.ws_provider.subscribe_logs(&filter).await?;
         Ok(sub.into_stream())

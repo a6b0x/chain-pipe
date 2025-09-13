@@ -18,7 +18,8 @@ cargo run --bin uniswap-source pair-created-event \
 cargo run --bin uniswap-source sync-event \
   --ws-url wss://reth-ethereum.ithaca.xyz/ws \
   --server-url nats-server:4222 \
-  --subject-name eth.univ2.pair.sync.0
+  --subject-name eth.univ2.pair.sync.0 \
+  --kv-bucket univ2_new_pairs
 
 cargo run --bin pair-enricher -- \
   --http-url https://reth-ethereum.ithaca.xyz/rpc \
@@ -106,6 +107,7 @@ nats --server=nats-server:4222 \
 nats --server=nats-server:4222 account info  
 nats --server=nats-server:4222 kv rm univ2_new_pairs
 nats --server=nats-server:4222 kv ls
+nats --server=nats-server:4222 kv ls univ2_new_pairs
 nats --server=nats-server:4222 kv get --raw univ2_new_pairs 0x538e4c324a97ccd381383b3ac6200cd3a47f6ed9
 nats --server=nats-server:4222 kv history univ2_new_pairs 0x48cf2c7c0e3c90793a1a3459cb49720da1a10071 
 
